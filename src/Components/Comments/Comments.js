@@ -12,21 +12,23 @@ const Comments = (props) => {
   const id = props.posts;
   const [comments, setComments] = useState([]);
 
-  const [images, setImages] = useState([]);
-
   useEffect(() => {
-    axios
-      .get(`https://jsonplaceholder.typicode.com/comments/?postId=${id}`)
-      .then((response) => setComments(response.data))
-      .catch((error) => console.log(error));
+    async function getComments() {
+      const { data } = await axios.get(
+        `https://jsonplaceholder.typicode.com/comments/?postId=${id}`
+      );
+      const cmts = await Promise.all(
+        data.map(async (comment) => {
+          const { data: users } = await axios.get(
+            `https://randomuser.me/api/?results=1`
+          );
+          return { ...comment, avatar: users.results[0].picture.medium };
+        })
+      );
+      setComments(cmts);
+    }
+    getComments();
   }, [id]);
-
-  useEffect(() => {
-    axios
-      .get(`https://randomuser.me/api/?results=1`)
-      .then((response) => setImages(response.data.results))
-      .catch((error) => console.log(error));
-  }, []);
 
   const useStyles = makeStyles((theme) => ({
     root: {
@@ -55,25 +57,18 @@ const Comments = (props) => {
       </div>
       {comments.map((comment) => (
         <div key={comment.id} className={classes.root}>
-          {images.map((image) => (
-            <Avatar
-              alt=""
-              src={image.picture.medium}
-              className={classes.avatar}
-              key={image.location.postcode}
-            />
-          ))}
+          <Avatar alt="" src={comment.avatar} className={classes.avatar} />
           <Card>
             <CardActionArea>
               <CardContent>
                 <Typography gutterBottom variant="h6" component="h2">
                   {comment.name}
                 </Typography>
-                <Typography variant="body2" color="textSecondary" component="p">
+                <Typography variant="body2" color="textPrimary" component="p">
                   {comment.email}
                 </Typography>
                 <br />
-                <Typography variant="body2" color="textSecondary" component="p">
+                <Typography variant="body2" color="textPrimary" component="p">
                   {comment.body}
                 </Typography>
               </CardContent>

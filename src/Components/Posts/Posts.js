@@ -44,7 +44,7 @@ const Posts = () => {
               <Typography gutterBottom variant="h5" component="h2">
                 {post.title}
               </Typography>
-              <Typography variant="body2" color="textSecondary" component="p">
+              <Typography variant="body2" color="textPrimary" component="p">
                 {post.body}
               </Typography>
             </CardContent>
